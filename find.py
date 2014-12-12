@@ -136,18 +136,28 @@ def LoadColorList(path):
     return colorList
 
 
+def WriteLine(target, line):
+    target.write(line + '\n')
+    return
+
+
+def PrintVersion():
+    WriteLine(sys.stderr, PROG_NAME + ' v.' + PROG_VERSION)
+    WriteLine(sys.stderr, 'Usage: python find.py ff4207')
+    return
+
+
 if __name__ == '__main__':
     colorList = LoadColorList('rgb.txt')
 
     args = sys.argv
-    print(args)
 
     if len(args) == 1:
-        sys.stderr.write(PROG_NAME + ' v.' + PROG_VERSION)
+        PrintVersion()
         exit(0)
 
     if len(args) != 2:
-        sys.stderr.write('Error: Too many args.')
+        WriteLine(sys.stderr, 'Error: Too many args.')
         exit(1)
 
     htmlColor = '#' + args[1]
@@ -167,7 +177,7 @@ if __name__ == '__main__':
         (distance, color) = distanceList[i]
         text = '{}: {} (+/-{})'.format(color.name, color.ToHTMLColor(),
                                        str(distance))
-        sys.stdout.write(text + '\n')
+        WriteLine(sys.stdout, text)
         continue
 
     exit(0)
