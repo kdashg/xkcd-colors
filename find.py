@@ -3,13 +3,13 @@ import sys
 
 
 PROG_NAME = 'XKCD Color Finder'
-PROG_VERSION = '0.1'
+PROG_VERSION = '0.2'
 RESULT_COUNT = 8
 
-# These are completely made up. Tune them to your liking.
-WEIGHT_HUE        = 3.0
-WEIGHT_SATURATION = 1.0
-WEIGHT_INTENSITY  = 1.0
+# Tunable weights
+WEIGHT_HUE        = 1.0
+WEIGHT_SATURATION = 4.0
+WEIGHT_INTENSITY  = 8.0
 
 
 def RGBtoHSI(RGB):
@@ -114,6 +114,7 @@ def MakeColor(name, htmlColor):
     return Color(name, red, green, blue)
 
 
+# Generates a list of colors, sorted most-popular first.
 def LoadColorList(path):
     colorList = []
 
@@ -133,7 +134,7 @@ def LoadColorList(path):
             colorList.append(color)
             continue
 
-    return colorList
+    return reversed(colorList)
 
 
 def WriteLine(target, line):
@@ -165,18 +166,21 @@ if __name__ == '__main__':
     targetRGB = targetColor.ToRGB()
 
     distanceList = []
+    i = 0
     for color in colorList:
+        i += 1
+
         distance = fnDistance(targetRGB, color.ToRGB()) * 255
-        pair = (distance, color)
+        pair = (i, distance, color)
         distanceList.append(pair)
         continue
 
-    distanceList.sort(key=lambda x: x[0])
+    distanceList.sort(key=lambda x: x[1])
 
     for i in range(RESULT_COUNT):
-        (distance, color) = distanceList[i]
-        text = '{}: {} (+/-{})'.format(color.name, color.ToHTMLColor(),
-                                       str(distance))
+        (popularity, distance, color) = distanceList[i]
+        text = '[{}] {}: {} (+/-{})'.format(str(popularity), color.name,
+                                            color.ToHTMLColor(), str(distance))
         WriteLine(sys.stdout, text)
         continue
 
